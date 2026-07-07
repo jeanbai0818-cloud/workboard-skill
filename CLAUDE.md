@@ -25,7 +25,7 @@ WorkboardSkill 是一个 OpenClaw **skill** 项目，提供 `workboard` skill：
 | GitHub | `jeanbai0818-cloud/workboard-skill` |
 | ClawHub | `jeanbai0818-cloud/workboard-skill` |
 
-> GitHub 仓库与 ClawHub 包同名，均为 `jeanbai0818-cloud/workboard-skill`；ClawHub publisher 用 `jeanbai0818-cloud`（不用 `tal`）。发布后用 `git remote -v` 和 `clawhub package inspect jeanbai0818-cloud/workboard-skill` 核实。
+> GitHub 仓库与 ClawHub 包同名，均为 `jeanbai0818-cloud/workboard-skill`；ClawHub publisher 用 `jeanbai0818-cloud`（不用 `tal`）。发布后用 `git remote -v` 和 `clawhub inspect workboard-skill` 核实。
 
 **每次发版都要双推**，缺一不可。发布顺序固定：先推 GitHub，再发布 ClawHub。
 
@@ -169,9 +169,10 @@ date '+%Y.%-m.%-d'
 # skill 版本通过 clawhub publish --version 传入，无文件需 grep
 ```
 
-**查看已发布版本（ClawHub 包名确认后）：**
+**查看 / 安装已发布 skill：**
 ```bash
-clawhub package inspect jeanbai0818-cloud/workboard-skill
+clawhub inspect workboard-skill
+clawhub install workboard-skill
 ```
 
 ---

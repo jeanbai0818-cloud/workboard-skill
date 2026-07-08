@@ -41,7 +41,7 @@ WorkboardSkill 是一个 OpenClaw **skill** 项目，提供 `workboard` skill：
 
 > skill 发布**不需要** `package.json` / `openclaw.plugin.json` / `_meta.json`：版本走 `clawhub publish --version`，slug 走 `--slug`，publisher 走 `--owner`，均由命令行传入。
 
-> ⚠️ **skill 路径实测限制**：`clawhub publish` 同版本号不可覆盖（报 `Version ... already exists`），且 `YYYY.M.D-N` 被当作 semver 预发布、优先级低于 `YYYY.M.D`，**不会**提升为 `latest`（`latest` 仍指向 `YYYY.M.D`）。因此 skill 的同日修正无法靠 `-N` 进入 `latest`——要么等下一个日期版本自然带上，要么接受 `-N` 仅作预发布。若确需当天让修正进入 latest，只能 `clawhub delete <slug>` 整体软删后用新 `YYYY.M.D` 重发（破坏性、会重新过审，慎用）。
+> ⚠️ **skill 路径实测限制**：`clawhub publish` 同版本号不可覆盖（报 `Version ... already exists`），且 `YYYY.M.D-N` 被当作 semver 预发布、优先级低于 `YYYY.M.D`，**不会**提升为 `latest`（`latest` 仍指向 `YYYY.M.D`）。`clawhub delete <slug>` 只是软删（slug 保留约 30 天、版本记录仍在），删后重发同版本号照样报 `already exists`——**无法**靠软删重发让当天修正进入 `latest`。结论：skill 的同日修正**只能**等下一个日期版本（如次日 `YYYY.M.D+1`）自然带上；`-N` 仅作可安装的预发布，不进 `latest`。
 
 ### 版本号生成规则（发版前必须执行）
 

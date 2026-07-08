@@ -137,10 +137,56 @@ gateway unavailable; data dispatch only: promoted=1 blocked=0
 
 新卡片可从模板开始：`bugfix`、`docs`、`release`、`pr_review`、`plugin`——预填标题 / notes / 标签 / 优先级，模板 id 存为卡片元数据。
 
+## 创建卡片：必填字段清单
+
+创建一张工作卡片时，至少填齐以下字段。CLI 用 `openclaw workboard create`，仪表盘在 Workboard 标签页新建——两者写入同一份 SQLite 状态。
+
+| 字段 | 必填 | 写法 | CLI flag |
+|---|---|---|---|
+| 标题 | 是 | 一句话点明这张卡要做什么 | 位置参数 `<title>` |
+| 备注 | 是 | 写清三块：① 背景 / 概述 ② **验收标准**（完成判定，逐条列） ③ **相关链接**（任务 / 运行 / 会话 / 源 URL）。务必清晰可执行 | `--notes <text>` |
+| 状态 | 是 | 新建一般 `todo`；已就绪可分派用 `ready` | `--status <status>`（默认 `todo`） |
+| 优先级 | 是 | `low` / `normal` / `high` / `urgent` | `--priority <priority>`（默认 `normal`） |
+| 代理 | 是 | 选定负责的 agent id（Workboard 本身允许留空，本规范要求必填） | `--agent <id>` |
+| 会话 | 是 | **必须绑定一个唯一会话**；建议**新建一个会话**绑定，不要复用（见下） | CLI 无；仪表盘绑定 |
+| 标签 | 是 | 逗号分隔，用于分类 / 筛选 | `--labels <items>` |
+
+### 会话绑定（重点）
+
+- **一张卡绑定一个唯一会话**：不要多卡共用一个会话。会话生命周期同步会按会话状态推进卡片（active→`running`、completed→`review`、failed/killed/timeout→`blocked`），多卡共用一个会话会把它们的状态搅在一起。
+- **建议新建会话绑定**，而不是复用现有会话——新建能保证唯一性和干净的生命周期。
+- **CLI 的 `create` 不带会话参数**：`openclaw workboard create` 没有 session 选项。建卡后到仪表盘 **Sessions 标签页 → Add to Workboard** 绑定一个（新）会话；或从卡片「开始工作」创建 / 复用会话并自动链接。
+- 若链接的会话缺失，卡片仍保持链接以保留上下文，并提供启动控件重启到新会话。
+
+### 备注写法
+
+备注里的**验收标准**和**链接**必须清晰可执行：
+
+- **验收标准**：写「做到什么算完成」，逐条列，可被完成者对照判定。
+- **链接**：贴具体的任务 id / 运行 id / 会话键 / 源 URL，不要只写笼统描述。
+
+### CLI 建卡示例
+
+```bash
+openclaw workboard create "修复 worker 心跳超时" \
+  --status todo \
+  --priority high \
+  --agent agent-a \
+  --labels bug,workboard \
+  --notes "背景：running 卡 >20min 无心跳被标 running_without_heartbeat。
+验收标准：
+- 复现并定位心跳丢失原因
+- 修复后 running 卡持续心跳 ≥30min 不再触发该诊断
+- 回归 1 次 dispatch 无 startFailures
+链接：任务 #123 / 运行 run-abc / 会话（新建后于仪表盘绑定）"
+```
+
+建卡后到仪表盘给这张卡绑定一个新会话。
+
 ## 默认流程
 
 - 用户想看现在有什么卡：`openclaw workboard list`，需要某状态就加 `--status ready`
-- 用户想建卡：`openclaw workboard create "<title>"`，按需带 `--priority` / `--status` / `--agent` / `--board` / `--labels` / `--notes`
+- 用户想建卡：按「创建卡片：必填字段清单」填齐标题 / 备注（含验收标准与链接）/ 状态 / 优先级 / 代理 / 标签，再 `openclaw workboard create` 建卡；CLI 不带会话参数，建卡后到仪表盘绑定一个**新**会话
 - 用户想看某张卡细节：`openclaw workboard show <id>`，要机器消费加 `--json`
 - 用户想让 worker 跑起来：先 `openclaw workboard list --status ready` 确认有未认领的就绪卡，再 `openclaw workboard dispatch`
 - 用户反馈「分派没启动」或「只报了数据调度」：走「故障排查」里的分派分支

@@ -76,11 +76,31 @@ git push
 # 4. 发布 ClawHub（skill 用顶层 clawhub publish，不是 clawhub package publish）
 clawhub publish . \
   --slug workboard-skill \
+  --name WorkboardSkill \
   --owner jeanbai0818-cloud \
   --version "$(date '+%Y.%-m.%-d')" \
+  --tags latest \
   --changelog "本次变更说明"
 ```
 
+**ClawHub 发布字段对照（网页表单 ↔ CLI）：**
+
+| 表单字段 | CLI flag | 说明 |
+|---|---|---|
+| Skill 文件夹 / 文件 | `<path>`（位置参数，如 `.`） | 须含 `SKILL.md` |
+| Display name | `--name WorkboardSkill` | 省略时默认取文件夹名 |
+| Slug | `--slug workboard-skill` | |
+| Summary | 无 flag | 取自 `SKILL.md` frontmatter `description` |
+| Categories | 无 flag | 仅网页后台可设；CLI 不支持 |
+| Topics | 无 flag | 仅网页后台可设；CLI 不支持 |
+| Publishing as | `--owner jeanbai0818-cloud` | |
+| Version | `--version "$(date '+%Y.%-m.%-d')"` | semver；规则见版本号规范；当前 latest=`2026.7.9` |
+| Release tags | `--tags latest` | 默认 latest，可省略 |
+| License | 无 flag | 固定 MIT-0 |
+| Changelog | `--changelog "..."` | |
+| MIT-0 接受 / 文件 / SKILL.md | 隐式 | 须含有效 `SKILL.md`（frontmatter `name` + `description`） |
+
+> Categories / Topics 需到 ClawHub 网页后台单独设置，CLI 发布命令不带。
 > skill 发布用顶层 `clawhub publish`（不是 yach-im 那条 `clawhub package publish --family code-plugin`，那是给插件用的）。skill 不带 `--source-repo` / `--source-commit`，GitHub 仓库与 ClawHub skill 仅内容同步，不在发布命令里 formally 关联。
 
 ---
